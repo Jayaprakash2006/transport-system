@@ -37,6 +37,12 @@ public class SecurityConfig {
 
                         .requestMatchers("/auth/**").permitAll()
 
+                        //lastttt
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/login", "/dashboard").permitAll()
+                        .anyRequest().authenticated()
+
+
                         .requestMatchers("/booking/book", "/booking/my", "/booking/cancel/**")
                         .hasAuthority("CUSTOMER")
 
