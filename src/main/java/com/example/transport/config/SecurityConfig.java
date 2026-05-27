@@ -35,18 +35,17 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/auth/**").permitAll()
-
-                        //lastttt
+                        // 🔓 PUBLIC APIs FIRST
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/login", "/dashboard").permitAll()
-                        .anyRequest().authenticated()
 
-
+                        // 🔐 ROLE-BASED APIs
                         .requestMatchers("/booking/book", "/booking/my", "/booking/cancel/**")
                         .hasAuthority("CUSTOMER")
 
-                        .requestMatchers("/vehicle/add", "/vehicle/update/**", "/vehicle/delete/**", "/vehicle/my", "/booking/owner")
+                        .requestMatchers("/vehicle/add", "/vehicle/update/**",
+                                "/vehicle/delete/**", "/vehicle/my",
+                                "/booking/owner")
                         .hasAuthority("VEHICLE_OWNER")
 
                         .requestMatchers("/booking/all")
@@ -55,9 +54,11 @@ public class SecurityConfig {
                         .requestMatchers("/vehicle/all")
                         .authenticated()
 
+                        // 🔐 FINAL CATCH-ALL (MUST BE LAST)
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -65,8 +66,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*")); // change to frontend URL in production
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+
+        config.setAllowedOrigins(List.of("*")); // replace with frontend URL in production
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -81,7 +83,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception {
         return config.getAuthenticationManager();
     }
 }
