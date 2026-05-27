@@ -2,9 +2,8 @@ package com.example.transport.model;
 
 public enum Role {
 
-    ADMIN,
-    CUSTOMER,
+    SUPER_ADMIN,
+    VEHICLE_OWNER,
     DRIVER,
-    SERVICE_PROVIDER,
-    FUEL_PROVIDER
+    CUSTOMER
 }

@@ -4,6 +4,7 @@ import com.example.transport.dto.VehicleRequest;
 import com.example.transport.model.Vehicle;
 import com.example.transport.service.VehicleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,29 +18,55 @@ public class VehicleController {
 
     @PostMapping("/add")
     public String addVehicle(
-            @RequestBody VehicleRequest request
+            @RequestBody VehicleRequest request,
+            Authentication authentication
     ) {
 
-        return vehicleService.addVehicle(request);
+        return vehicleService.addVehicle(
+                request,
+                authentication
+        );
     }
 
     @PutMapping("/update/{id}")
     public String updateVehicle(
             @PathVariable Long id,
-            @RequestBody VehicleRequest request
+            @RequestBody VehicleRequest request,
+            Authentication authentication
     ) {
 
-        return vehicleService.updateVehicle(id, request);
+        return vehicleService.updateVehicle(
+                id,
+                request,
+                authentication
+        );
     }
 
-    @DeleteMapping("delete/{id}")
-    public String deleteVehicle(@PathVariable Long id) {
-        return vehicleService.deleteVehicle(id);
+    @DeleteMapping("/delete/{id}")
+    public String deleteVehicle(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+
+        return vehicleService.deleteVehicle(
+                id,
+                authentication
+        );
     }
 
     @GetMapping("/all")
     public List<Vehicle> getAllVehicles() {
 
         return vehicleService.getAllVehicles();
+    }
+
+    @GetMapping("/my")
+    public List<Vehicle> getMyVehicles(
+            Authentication authentication
+    ) {
+
+        return vehicleService.getMyVehicles(
+                authentication
+        );
     }
 }

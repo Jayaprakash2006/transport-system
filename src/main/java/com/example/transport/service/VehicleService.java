@@ -1,9 +1,11 @@
 package com.example.transport.service;
 
 import com.example.transport.dto.VehicleRequest;
+import com.example.transport.model.User;
 import com.example.transport.model.Vehicle;
 import com.example.transport.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,17 +16,37 @@ public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
 
-    public String addVehicle(VehicleRequest request) {
+    public String addVehicle(
+            VehicleRequest request,
+            Authentication authentication
+    ) {
+
+        User owner =
+                (User) authentication.getPrincipal();
 
         Vehicle vehicle = new Vehicle();
 
-        vehicle.setVehicleNumber(request.getVehicleNumber());
-        vehicle.setVehicleName(request.getVehicleName());
-        vehicle.setVehicleType(request.getVehicleType());
-        vehicle.setBrand(request.getBrand());
-        vehicle.setPricePerDay(request.getPricePerDay());
+        vehicle.setOwner(owner);
 
-        vehicle.setAvailable(true);
+        vehicle.setVehicleNumber(
+                request.getVehicleNumber()
+        );
+
+        vehicle.setVehicleName(
+                request.getVehicleName()
+        );
+
+        vehicle.setVehicleType(
+                request.getVehicleType()
+        );
+
+        vehicle.setBrand(
+                request.getBrand()
+        );
+
+        vehicle.setPricePerDay(
+                request.getPricePerDay()
+        );
 
         vehicleRepository.save(vehicle);
 
@@ -33,8 +55,12 @@ public class VehicleService {
 
     public String updateVehicle(
             Long id,
-            VehicleRequest request
+            VehicleRequest request,
+            Authentication authentication
     ) {
+
+        User currentUser =
+                (User) authentication.getPrincipal();
 
         Vehicle vehicle = vehicleRepository
                 .findById(id)
@@ -44,18 +70,45 @@ public class VehicleService {
             return "Vehicle not found";
         }
 
-        vehicle.setVehicleNumber(request.getVehicleNumber());
-        vehicle.setVehicleName(request.getVehicleName());
-        vehicle.setVehicleType(request.getVehicleType());
-        vehicle.setBrand(request.getBrand());
-        vehicle.setPricePerDay(request.getPricePerDay());
+        if (!vehicle.getOwner()
+                .getId()
+                .equals(currentUser.getId())) {
+
+            return "You can manage only your vehicles";
+        }
+
+        vehicle.setVehicleNumber(
+                request.getVehicleNumber()
+        );
+
+        vehicle.setVehicleName(
+                request.getVehicleName()
+        );
+
+        vehicle.setVehicleType(
+                request.getVehicleType()
+        );
+
+        vehicle.setBrand(
+                request.getBrand()
+        );
+
+        vehicle.setPricePerDay(
+                request.getPricePerDay()
+        );
 
         vehicleRepository.save(vehicle);
 
         return "Vehicle updated successfully";
     }
 
-    public String deleteVehicle(Long id) {
+    public String deleteVehicle(
+            Long id,
+            Authentication authentication
+    ) {
+
+        User currentUser =
+                (User) authentication.getPrincipal();
 
         Vehicle vehicle = vehicleRepository
                 .findById(id)
@@ -63,6 +116,13 @@ public class VehicleService {
 
         if (vehicle == null) {
             return "Vehicle not found";
+        }
+
+        if (!vehicle.getOwner()
+                .getId()
+                .equals(currentUser.getId())) {
+
+            return "You can manage only your vehicles";
         }
 
         vehicleRepository.delete(vehicle);
@@ -73,5 +133,15 @@ public class VehicleService {
     public List<Vehicle> getAllVehicles() {
 
         return vehicleRepository.findAll();
+    }
+
+    public List<Vehicle> getMyVehicles(
+            Authentication authentication
+    ) {
+
+        User owner =
+                (User) authentication.getPrincipal();
+
+        return vehicleRepository.findByOwner(owner);
     }
 }

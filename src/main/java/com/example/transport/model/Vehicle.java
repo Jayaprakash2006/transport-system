@@ -26,5 +26,7 @@ public class Vehicle {
 
     private Double pricePerDay;
 
-    private Boolean available;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 }

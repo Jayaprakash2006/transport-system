@@ -20,8 +20,9 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http
+    ) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -37,23 +38,39 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**")
                         .permitAll()
 
+                        // CUSTOMER
+                        .requestMatchers("/booking/book")
+                        .hasAuthority("CUSTOMER")
+
+                        .requestMatchers("/booking/my")
+                        .hasAuthority("CUSTOMER")
+
+                        .requestMatchers("/booking/cancel/**")
+                        .hasAuthority("CUSTOMER")
+
+                        // VEHICLE OWNER
                         .requestMatchers("/vehicle/add")
-                        .hasAuthority("ADMIN")
+                        .hasAuthority("VEHICLE_OWNER")
 
                         .requestMatchers("/vehicle/update/**")
-                        .hasAuthority("ADMIN")
+                        .hasAuthority("VEHICLE_OWNER")
 
                         .requestMatchers("/vehicle/delete/**")
-                        .hasAuthority("ADMIN")
+                        .hasAuthority("VEHICLE_OWNER")
 
+                        .requestMatchers("/vehicle/my")
+                        .hasAuthority("VEHICLE_OWNER")
+
+                        .requestMatchers("/booking/owner")
+                        .hasAuthority("VEHICLE_OWNER")
+
+                        // SUPER ADMIN
+                        .requestMatchers("/booking/all")
+                        .hasAuthority("SUPER_ADMIN")
+
+                        // COMMON
                         .requestMatchers("/vehicle/all")
                         .authenticated()
-
-                        .requestMatchers("/admin/**")
-                        .hasAuthority("ADMIN")
-
-                        .requestMatchers("/customer/**")
-                        .hasAuthority("CUSTOMER")
 
                         .anyRequest()
                         .authenticated()
